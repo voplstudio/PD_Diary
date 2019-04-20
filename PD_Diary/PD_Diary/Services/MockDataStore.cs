@@ -15,7 +15,7 @@ namespace PD_Diary.Services
             items = new List<Nutrient>();
             var mockItems = new List<Nutrient>
             {
-                new Nutrient { Id = Guid.NewGuid().ToString(), Text = "Свинина тушенная",
+                new Nutrient { Id = (new Guid("FBFBC500-209F-4A8B-88CF-A6EB8DF01192")).ToString(), Text = "Свинина тушенная",
                     Components = new List<Component> {
                         new Component{Id = ComponentType.Protein, Per100gramm = 14.9},
                         new Component{Id = ComponentType.Fat, Per100gramm = 32.2},
@@ -25,7 +25,7 @@ namespace PD_Diary.Services
                         new Component{Id = ComponentType.Phosphates, Per100gramm = 160},
                         new Component{Id = ComponentType.Calories, Per100gramm = 349}
                     } },
-                new Nutrient { Id = Guid.NewGuid().ToString(), Text = "Сыр Пармезан",
+                new Nutrient { Id = (new Guid("010223F7-094D-4CAE-A3B2-4DF65BE47479")).ToString(), Text = "Сыр Пармезан",
                     Components = new List<Component> {
                         new Component{Id = ComponentType.Protein, Per100gramm = 35.6},
                         new Component{Id = ComponentType.Fat, Per100gramm = 30},
@@ -35,7 +35,7 @@ namespace PD_Diary.Services
                         new Component{Id = ComponentType.Phosphates, Per100gramm = 840},
                         new Component{Id = ComponentType.Calories, Per100gramm = 412}
                     } },
-                new Nutrient { Id = Guid.NewGuid().ToString(), Text = "Банан",
+                new Nutrient { Id = (new Guid("F8D9A4A4-891F-49F6-8123-80CAD3EDDC85")).ToString(), Text = "Банан",
                     Components = new List<Component> {
                         new Component{Id = ComponentType.Protein, Per100gramm = 1.2},
                         new Component{Id = ComponentType.Fat, Per100gramm = 0},

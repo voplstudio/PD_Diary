@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using PD_Diary.Models;
+using PD_Diary.ViewModels;
+using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-
-using PD_Diary.Models;
-using PD_Diary.Views;
-using PD_Diary.ViewModels;
 
 namespace PD_Diary.Views
 {
@@ -27,9 +20,10 @@ namespace PD_Diary.Views
 
         async void OnItemSelected(object sender, SelectedItemChangedEventArgs args)
         {
-            var item = args.SelectedItem as Nutrient;
-            if (item == null)
+            if (!(args.SelectedItem is Nutrient item))
+            {
                 return;
+            }
 
             await Navigation.PushAsync(new ItemDetailPage(new ItemDetailViewModel(item)));
 
