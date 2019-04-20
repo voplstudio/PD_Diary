@@ -11,15 +11,15 @@ namespace PD_Diary.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class NewItemPage : ContentPage
     {
-        public Item Item { get; set; }
+        public Nutrient Item { get; set; }
 
         public NewItemPage()
         {
             InitializeComponent();
 
-            Item = new Item
+            Item = new Nutrient
             {
-                Text = "Item name",
+                Text = "Nutrient name",
                 Description = "This is an item description."
             };
 

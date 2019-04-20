@@ -24,9 +24,9 @@ namespace PD_Diary.Views
         {
             InitializeComponent();
 
-            var item = new Item
+            var item = new Nutrient
             {
-                Text = "Item 1",
+                Text = "Nutrient 1",
                 Description = "This is an item description."
             };
 

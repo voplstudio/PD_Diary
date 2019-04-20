@@ -6,8 +6,8 @@ namespace PD_Diary.ViewModels
 {
     public class ItemDetailViewModel : BaseViewModel
     {
-        public Item Item { get; set; }
-        public ItemDetailViewModel(Item item = null)
+        public Nutrient Item { get; set; }
+        public ItemDetailViewModel(Nutrient item = null)
         {
             Title = item?.Text;
             Item = item;

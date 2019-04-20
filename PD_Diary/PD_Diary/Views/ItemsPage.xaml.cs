@@ -27,7 +27,7 @@ namespace PD_Diary.Views
 
         async void OnItemSelected(object sender, SelectedItemChangedEventArgs args)
         {
-            var item = args.SelectedItem as Item;
+            var item = args.SelectedItem as Nutrient;
             if (item == null)
                 return;
 
