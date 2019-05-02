@@ -6,6 +6,7 @@ namespace PD_Diary.Models
 {
     public enum MenuItemType
     {
+        DaySummary,
         Browse,
         About
     }

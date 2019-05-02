@@ -14,6 +14,35 @@ namespace PD_Diary.Views
     {
         ItemDetailViewModel viewModel;
 
+        private bool _readOnly = true;
+        private Grid grid = null;
+
+        public bool ReadOnly
+        {
+            get { return _readOnly; }
+            set
+            {
+                if (FirstStackLayout != null)
+                {
+                    if ( grid  != null)
+                    {
+                        for ( int i = 0; i < grid.RowDefinitions.Count; i++)
+                        {
+                            Editor editor = (Editor)grid.Children[i*3+1];
+                            if ( editor != null)
+                            {
+                                editor.IsEnabled = !value;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        public View GetView(Grid grid, int col, int row)
+        {
+            foreach (View v in grid.Children) if ((col == Grid.GetColumn(v)) && (row == Grid.GetRow(v))) return v;
+            return null;
+        }
         public ItemDetailPage(ItemDetailViewModel viewModel)
         {
             InitializeComponent();
@@ -65,12 +94,13 @@ namespace PD_Diary.Views
 
         private void AddComponentsAsGrid(Nutrient nutrient)
         {
-            if (nutrient == null || nutrient.Components == null ||nutrient.Components.Count ==0)
+            if (nutrient == null || nutrient.Components == null || nutrient.Components.Count == 0)
             {
                 FirstStackLayout.Children.Add(new Label { Text = "Нет данных" });
+                return;
             }
 
-            var grid = new Grid();
+            grid = new Grid();
 
             for (int i = 0; i < nutrient.Components.Count; i++)
             {
@@ -87,10 +117,10 @@ namespace PD_Diary.Views
             for (int i = 0; i < nutrient.Components.Count; i++)
             {
                 grid.Children.Add(new Label { Text = nutrient.Components[i].Id.ToString() }, 0, i + 1);
-                grid.Children.Add(new Label { Text = nutrient.Components[i].Per100gramm.ToString() }, 1, i + 1);
+                grid.Children.Add(new Editor { Text = nutrient.Components[i].Per100gramm.ToString(), IsEnabled=!_readOnly }, 1, i + 1);
                 grid.Children.Add(new Label { Text = nutrient.Components[i].Id.GetUnits() }, 2, i + 1);
             }
-
+            
             FirstStackLayout.Children.Add(grid);
         }
     }
