@@ -4,14 +4,25 @@
              x:Class="PD_Diary.Views.DayPage">
     <ContentPage.Content>
         <StackLayout>
-            <Label Text="28.04.2019" x:Name="ChosenDateLabel"
-                VerticalOptions="CenterAndExpand" 
+            <Label x:Name="ChosenDateLabel"
+                VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
             <Grid x:Name="SummaryGrid">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="40" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <!--<RowDefinition Height="*" />-->
+                </Grid.RowDefinitions>
+            </Grid>
+            <Grid x:Name="MealGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="40" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>

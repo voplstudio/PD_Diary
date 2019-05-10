@@ -2,7 +2,7 @@
 {
     public class Consumption
     {
-        public int Id;
+        public string Id;
         public double Weight;
     }
 }

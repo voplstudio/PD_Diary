@@ -5,6 +5,6 @@ namespace PD_Diary.Models
     public class Meal
     {
         public List<Consumption> Consumptions;
-        public int Id;
+        public MealType Id;
     }
 }

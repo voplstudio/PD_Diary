@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PD_Diary.Models
 {
-    class DailyRecord
+    public class DailyRecord
     {
         public List<Meal> Meals;
         public DateTime Date;
