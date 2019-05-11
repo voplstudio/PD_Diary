@@ -57,40 +57,12 @@ namespace PD_Diary.Services
         }
         public DailyRecord GetDailyRecord(DateTime date)
         {
-            return new DailyRecord()
-            {
-                Date = date,
-                Meals = new List<Meal>
-                {
-                    new Meal()
-                    {
-                        Id = MealType.Breakfast, Consumptions = new List<Consumption>()
-                        {
-                            new Consumption()
-                            {
-                                Id = id1,
-                                Weight = 200
-                            }
-                        }
-                    },
-                    new Meal()
-                    {
-                        Id = MealType.Lunch, Consumptions = new List<Consumption>()
-                        {
-                            new Consumption()
-                            {
-                                Id = id2,
-                                Weight = 100
-                            },
-                            new Consumption()
-                            {
-                                Id = id3,
-                                Weight = 300
-                            }
-                        }
-                    }
-                }
-            };
+            DailyRecord dailyRecord = new DailyRecord();
+            dailyRecord.Date = date;            
+            dailyRecord.AddConsumption(MealType.Breakfast, id1, 200);
+            dailyRecord.AddConsumption(MealType.Lunch, id2, 100);
+            dailyRecord.AddConsumption(MealType.Lunch, id3, 300);
+            return dailyRecord;
         }
         public async Task<bool> AddItemAsync(Nutrient item)
         {

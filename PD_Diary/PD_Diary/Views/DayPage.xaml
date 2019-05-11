@@ -3,15 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PD_Diary.Views.DayPage">
     <ContentPage.Content>
+        <ScrollView HorizontalScrollBarVisibility = "Always">
         <StackLayout>
             <Label x:Name="ChosenDateLabel"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
             <Grid x:Name="SummaryGrid">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200" />
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -20,9 +21,9 @@
             </Grid>
             <Grid x:Name="MealGrid">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200" />
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -31,5 +32,6 @@
             </Grid>
             
         </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

@@ -4,5 +4,11 @@
     {
         public string Id;
         public double Weight;
+
+        public Consumption(string id, double weight)
+        {
+            Id = id;
+            Weight = weight;
+        }
     }
 }
