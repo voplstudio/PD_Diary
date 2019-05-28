@@ -57,8 +57,7 @@ namespace PD_Diary.Services
         }
         public DailyRecord GetDailyRecord(DateTime date)
         {
-            DailyRecord dailyRecord = new DailyRecord();
-            dailyRecord.Date = date;            
+            DailyRecord dailyRecord = new DailyRecord { Date = date };
             dailyRecord.AddConsumption(MealType.Breakfast, id1, 200);
             dailyRecord.AddConsumption(MealType.Lunch, id2, 100);
             dailyRecord.AddConsumption(MealType.Lunch, id3, 300);
@@ -97,6 +96,6 @@ namespace PD_Diary.Services
         {
             return await Task.FromResult(items);
         }
-        
+
     }
 }
