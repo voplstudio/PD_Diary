@@ -21,7 +21,7 @@ namespace PD_Diary.ViewModels
             Items = new ObservableCollection<Nutrient>();
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
 
-            MessagingCenter.Subscribe<NewItemPage, Nutrient>(this, "AddItem", async (obj, item) =>
+            MessagingCenter.Subscribe<ItemDetailPage, Nutrient>(this, "AddNutrient", async (obj, item) =>
             {
                 var newItem = item as Nutrient;
                 Items.Add(newItem);

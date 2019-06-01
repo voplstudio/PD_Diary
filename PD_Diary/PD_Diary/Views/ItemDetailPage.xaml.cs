@@ -12,7 +12,7 @@ namespace PD_Diary.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ItemDetailPage : ContentPage
     {
-        ItemDetailViewModel viewModel;
+        public Nutrient _nutrient;
 
         private bool _readOnly = true;
         private Grid grid = null;
@@ -24,12 +24,12 @@ namespace PD_Diary.Views
             {
                 if (FirstStackLayout != null)
                 {
-                    if ( grid  != null)
+                    if (grid != null)
                     {
-                        for ( int i = 0; i < grid.RowDefinitions.Count; i++)
+                        for (int i = 0; i < grid.RowDefinitions.Count; i++)
                         {
-                            Editor editor = (Editor)grid.Children[i*3+1];
-                            if ( editor != null)
+                            Editor editor = (Editor)grid.Children[i * 3 + 1];
+                            if (editor != null)
                             {
                                 editor.IsEnabled = !value;
                             }
@@ -43,38 +43,55 @@ namespace PD_Diary.Views
             foreach (View v in grid.Children) if ((col == Grid.GetColumn(v)) && (row == Grid.GetRow(v))) return v;
             return null;
         }
-        public ItemDetailPage(ItemDetailViewModel viewModel)
+        public ItemDetailPage(Nutrient nutrient)
         {
             InitializeComponent();
 
-            BindingContext = this.viewModel = viewModel;
+            _nutrient = nutrient;
 
-            AddComponentsAsGrid(viewModel.Item);
+            if (_nutrient == null)
+            {
+                _nutrient = NewNutrient();
+            }
+
+            AddComponentsAsGrid();
+            MessagingCenter.Subscribe<ItemDetailPage, Nutrient>(this, "AddNutrient", async (obj, item) =>
+            {
+                for (int i = 0; i < _nutrient.Components.Count; i++)
+                {
+                    Editor editor = (Editor)grid.Children[i * 3 + 1];
+                    double result = 0;
+                    if (Double.TryParse(editor.Text, out result)) _nutrient.Components[i].Per100gramm = result;
+                }
+
+                await new Services.MockDataStore().AddItemAsync(_nutrient);
+            });
+        }
+
+        private static Nutrient NewNutrient()
+        {
+            return new Nutrient()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Components = new List<Component> {
+                        new Component{Id = ComponentType.Protein, Per100gramm = 0},
+                        new Component{Id = ComponentType.Fat, Per100gramm = 0},
+                        new Component{Id = ComponentType.Carbohydrate, Per100gramm = 0},
+                        new Component{Id = ComponentType.Sodium, Per100gramm = 0},
+                        new Component{Id = ComponentType.Potassium, Per100gramm = 0},
+                        new Component{Id = ComponentType.Phosphates, Per100gramm = 0},
+                        new Component{Id = ComponentType.Calories, Per100gramm = 0}
+                    }
+            };
         }
 
         public ItemDetailPage()
         {
             InitializeComponent();
 
-            var item = new Nutrient
-            {
-                Id = (new Guid("FBFBC500-209F-4A8B-88CF-A6EB8DF01192")).ToString(),
-                Text = "Свинина тушенная",
-                Components = new List<Component> {
-                        new Component{Id = ComponentType.Protein, Per100gramm = 14.9},
-                        new Component{Id = ComponentType.Fat, Per100gramm = 32.2},
-                        new Component{Id = ComponentType.Carbohydrate, Per100gramm = 0},
-                        new Component{Id = ComponentType.Sodium, Per100gramm = 456},
-                        new Component{Id = ComponentType.Potassium, Per100gramm = 253},
-                        new Component{Id = ComponentType.Phosphates, Per100gramm = 160},
-                        new Component{Id = ComponentType.Calories, Per100gramm = 349}
-                    }
-            };
+            _nutrient = new Services.MockDataStore().GetItemAsync("FBFBC500-209F-4A8B-88CF-A6EB8DF01192").Result;
 
-            viewModel = new ItemDetailViewModel(item);
-            BindingContext = viewModel;
-
-            AddComponentsAsGrid(item);
+            AddComponentsAsGrid();
         }
 
         private void AddComponents(Nutrient item)
@@ -92,9 +109,9 @@ namespace PD_Diary.Views
             }
         }
 
-        private void AddComponentsAsGrid(Nutrient nutrient)
+        private void AddComponentsAsGrid()
         {
-            if (nutrient == null || nutrient.Components == null || nutrient.Components.Count == 0)
+            if (_nutrient == null || _nutrient.Components == null || _nutrient.Components.Count == 0)
             {
                 FirstStackLayout.Children.Add(new Label { Text = "Нет данных" });
                 return;
@@ -102,7 +119,7 @@ namespace PD_Diary.Views
 
             grid = new Grid();
 
-            for (int i = 0; i < nutrient.Components.Count; i++)
+            for (int i = 0; i < _nutrient.Components.Count; i++)
             {
                 grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0, GridUnitType.Auto) });
             }
@@ -114,14 +131,24 @@ namespace PD_Diary.Views
 
             FirstStackLayout.Children.Add(new Label { Text = "Состав в 100g" });
 
-            for (int i = 0; i < nutrient.Components.Count; i++)
+            for (int i = 0; i < _nutrient.Components.Count; i++)
             {
-                grid.Children.Add(new Label { Text = nutrient.Components[i].Id.ToString() }, 0, i + 1);
-                grid.Children.Add(new Editor { Text = nutrient.Components[i].Per100gramm.ToString(), IsEnabled=!_readOnly }, 1, i + 1);
-                grid.Children.Add(new Label { Text = nutrient.Components[i].Id.GetUnits() }, 2, i + 1);
+                grid.Children.Add(new Label { Text = _nutrient.Components[i].Id.ToString() }, 0, i + 1);
+                grid.Children.Add(new Editor { Text = _nutrient.Components[i].Per100gramm.ToString(), IsEnabled = !_readOnly }, 1, i + 1);
+                grid.Children.Add(new Label { Text = _nutrient.Components[i].Id.GetUnits() }, 2, i + 1);
             }
-            
+
             FirstStackLayout.Children.Add(grid);
+        }
+        async void Save_Clicked(object sender, EventArgs e)
+        {
+            MessagingCenter.Send(this, "AddNutrient", _nutrient);
+            await Navigation.PopModalAsync();
+        }
+
+        async void Cancel_Clicked(object sender, EventArgs e)
+        {
+            await Navigation.PopModalAsync();
         }
     }
 }

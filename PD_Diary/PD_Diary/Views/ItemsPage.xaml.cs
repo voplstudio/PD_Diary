@@ -25,7 +25,7 @@ namespace PD_Diary.Views
                 return;
             }
 
-            await Navigation.PushAsync(new ItemDetailPage(new ItemDetailViewModel(item)));
+            await Navigation.PushModalAsync(new NavigationPage(new ItemDetailPage(item)));
 
             // Manually deselect item.
             ItemsListView.SelectedItem = null;
@@ -33,7 +33,9 @@ namespace PD_Diary.Views
 
         async void AddItem_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushModalAsync(new NavigationPage(new NewItemPage()));
+
+            await Navigation.PushModalAsync(new NavigationPage(new ItemDetailPage(null) { ReadOnly = false }));
+            //await Navigation.PushModalAsync(new NavigationPage(new NewItemPage()));
         }
 
         protected override void OnAppearing()

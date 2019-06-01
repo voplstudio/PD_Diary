@@ -3,20 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PD_Diary.Models;
+using Xamarin.Forms;
 
 namespace PD_Diary.Services
 {
     public class MockDataStore : IDataStore<Nutrient>
     {
-        List<Nutrient> items;
-        private const string id1 = "FBFBC500-209F-4A8B-88CF-A6EB8DF01192";
-        private const string id2 = "010223F7-094D-4CAE-A3B2-4DF65BE47479";
-        private const string id3 = "F8D9A4A4-891F-49F6-8123-80CAD3EDDC85";
-
-        public MockDataStore()
-        {
-            items = new List<Nutrient>();
-            var mockItems = new List<Nutrient>
+        static List<Nutrient> items = new List<Nutrient>
             {
                 new Nutrient { Id = id1, Text = "Свинина тушенная",
                     Components = new List<Component> {
@@ -49,12 +42,10 @@ namespace PD_Diary.Services
                         new Component{Id = ComponentType.Calories, Per100gramm = 94}
                     } }
             };
+        private const string id1 = "FBFBC500-209F-4A8B-88CF-A6EB8DF01192";
+        private const string id2 = "010223F7-094D-4CAE-A3B2-4DF65BE47479";
+        private const string id3 = "F8D9A4A4-891F-49F6-8123-80CAD3EDDC85";
 
-            foreach (var item in mockItems)
-            {
-                items.Add(item);
-            }
-        }
         public DailyRecord GetDailyRecord(DateTime date)
         {
             DailyRecord dailyRecord = new DailyRecord { Date = date };
@@ -65,8 +56,13 @@ namespace PD_Diary.Services
         }
         public async Task<bool> AddItemAsync(Nutrient item)
         {
-            items.Add(item);
+            if (item.Components.Sum(x => x.Per100gramm) != 0)
+            {
+                if (string.IsNullOrEmpty(item.Text)) { item.Text = "Новый продукт"; }
+                if (string.IsNullOrEmpty(item.Id)) { item.Id = Guid.NewGuid().ToString(); }
 
+                items.Add(item);
+            }
             return await Task.FromResult(true);
         }
 
