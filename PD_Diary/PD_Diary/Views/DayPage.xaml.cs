@@ -54,7 +54,7 @@ namespace PD_Diary.Views
             {
                 foreach (Consumption consumption in meal.Consumptions)
                 {
-                    Nutrient nutrient = new MockDataStore().GetItemAsync(consumption.Id).Result;
+                    Nutrient nutrient = new MockDataStore().GetItem(consumption.Id);
                     foreach (Component component in nutrient.Components)
                     {
                         double addition = component.Per100gramm * consumption.Weight / 100.0;

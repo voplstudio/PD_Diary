@@ -6,22 +6,27 @@ using Xamarin.Forms.Xaml;
 using PD_Diary.Models;
 using PD_Diary.ViewModels;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PD_Diary.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ItemDetailPage : ContentPage
     {
-        public Nutrient _nutrient;
+        public Nutrient _nutrient { get; set; }
 
         private bool _readOnly = true;
         private Grid grid = null;
+        private Editor titleEditor = null;
 
         public bool ReadOnly
         {
             get { return _readOnly; }
             set
             {
+                if (_readOnly == value) return;
+                _readOnly = value;
+
                 if (FirstStackLayout != null)
                 {
                     if (grid != null)
@@ -31,11 +36,18 @@ namespace PD_Diary.Views
                             Editor editor = (Editor)grid.Children[i * 3 + 1];
                             if (editor != null)
                             {
-                                editor.IsEnabled = !value;
+                                editor.IsEnabled = !_readOnly;
                             }
                         }
                     }
+                    if (titleEditor != null)
+                    {
+                        titleEditor.IsEnabled = !_readOnly;
+                    }
                 }
+                ToolbarItems[1].IsEnabled = !_readOnly;
+                ToolbarItems[2].IsEnabled = _readOnly;
+
             }
         }
         public View GetView(Grid grid, int col, int row)
@@ -45,26 +57,21 @@ namespace PD_Diary.Views
         }
         public ItemDetailPage(Nutrient nutrient)
         {
-            InitializeComponent();
+            InitializeComponent();                      
 
-            _nutrient = nutrient;
-
-            if (_nutrient == null)
+            if (nutrient == null)
             {
                 _nutrient = NewNutrient();
             }
+            else _nutrient = nutrient.Clone();
 
             AddComponentsAsGrid();
             MessagingCenter.Subscribe<ItemDetailPage, Nutrient>(this, "AddNutrient", async (obj, item) =>
             {
-                for (int i = 0; i < _nutrient.Components.Count; i++)
-                {
-                    Editor editor = (Editor)grid.Children[i * 3 + 1];
-                    double result = 0;
-                    if (Double.TryParse(editor.Text, out result)) _nutrient.Components[i].Per100gramm = result;
-                }
-
-                await new Services.MockDataStore().AddItemAsync(_nutrient);
+            });
+            MessagingCenter.Subscribe<ItemDetailPage, Nutrient>(this, "RemoveNutrient", async (obj, item) =>
+            {
+                await new Services.MockDataStore().DeleteItemAsync(_nutrient.Id);
             });
         }
 
@@ -72,7 +79,7 @@ namespace PD_Diary.Views
         {
             return new Nutrient()
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = "",
                 Components = new List<Component> {
                         new Component{Id = ComponentType.Protein, Per100gramm = 0},
                         new Component{Id = ComponentType.Fat, Per100gramm = 0},
@@ -116,7 +123,8 @@ namespace PD_Diary.Views
                 FirstStackLayout.Children.Add(new Label { Text = "Нет данных" });
                 return;
             }
-
+            FirstStackLayout.Children.Add(new Label { Text = "Название продукта" });
+            FirstStackLayout.Children.Add(titleEditor = new Editor { Text = _nutrient.Text, IsEnabled = !_readOnly });
             grid = new Grid();
 
             for (int i = 0; i < _nutrient.Components.Count; i++)
@@ -142,12 +150,36 @@ namespace PD_Diary.Views
         }
         async void Save_Clicked(object sender, EventArgs e)
         {
+            for (int i = 0; i < _nutrient.Components.Count; i++)
+            {
+                Editor editor = (Editor)grid.Children[i * 3 + 1];
+                double result = 0;
+                if (Double.TryParse(editor.Text, out result)) _nutrient.Components[i].Per100gramm = result;
+            }
+            if (titleEditor != null)
+                _nutrient.Text = titleEditor.Text;
+
+            await new Services.MockDataStore().AddItemAsync(_nutrient);
+
+            if (string.IsNullOrEmpty(_nutrient.Id))
+                MessagingCenter.Send(this, "AddNutrientOnList", _nutrient);
+            else MessagingCenter.Send(this, "UpdateNutrient", _nutrient);
             MessagingCenter.Send(this, "AddNutrient", _nutrient);
             await Navigation.PopModalAsync();
         }
 
         async void Cancel_Clicked(object sender, EventArgs e)
         {
+            await Navigation.PopModalAsync();
+        }
+        void Edit_Clicked(object sender, EventArgs e)
+        {
+            ReadOnly = !ReadOnly;
+        }
+
+        async private void Delete_Clicked(object sender, EventArgs e)
+        {
+            MessagingCenter.Send(this, "RemoveNutrient", _nutrient);
             await Navigation.PopModalAsync();
         }
     }

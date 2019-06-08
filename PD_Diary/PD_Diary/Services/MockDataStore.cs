@@ -56,12 +56,28 @@ namespace PD_Diary.Services
         }
         public async Task<bool> AddItemAsync(Nutrient item)
         {
+            Nutrient foundItem = items.FirstOrDefault(x => x.Id == item.Id);
+            if (foundItem == null)
+            {
+                           
             if (item.Components.Sum(x => x.Per100gramm) != 0)
             {
                 if (string.IsNullOrEmpty(item.Text)) { item.Text = "Новый продукт"; }
                 if (string.IsNullOrEmpty(item.Id)) { item.Id = Guid.NewGuid().ToString(); }
 
                 items.Add(item);
+            }}
+            else
+            {
+                if (foundItem != item)
+                {
+                    foundItem.Text = item.Text;
+                    foundItem.Components.Clear();
+                    foreach (Component component in item.Components)
+                    {
+                        foundItem.Components.Add(component);
+                    }
+                }
             }
             return await Task.FromResult(true);
         }
@@ -85,9 +101,14 @@ namespace PD_Diary.Services
 
         public async Task<Nutrient> GetItemAsync(string id)
         {
-            return await Task.FromResult(items.FirstOrDefault(s => s.Id == id));
+            return await Task.FromResult(GetItem(id));
         }
-
+        public Nutrient GetItem(string id)
+        {
+            var item = items.FirstOrDefault(s => s.Id == id);
+            if (item != null) return item.Clone();
+            else return null;
+        }
         public async Task<IEnumerable<Nutrient>> GetItemsAsync(bool forceRefresh = false)
         {
             return await Task.FromResult(items);
