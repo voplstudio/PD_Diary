@@ -12,7 +12,7 @@ namespace PD_Diary.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
-        public IDataStore<Nutrient> DataStore => DependencyService.Get<IDataStore<Nutrient>>() ?? new MockDataStore();
+        public NutrientRepository DataStore => DependencyService.Get<NutrientRepository>() ?? App.Database;
 
         bool isBusy = false;
         public bool IsBusy

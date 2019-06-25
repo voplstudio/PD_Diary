@@ -9,7 +9,7 @@ namespace PD_Diary.ViewModels
         public Nutrient Item { get; set; }
         public ItemDetailViewModel(Nutrient item = null)
         {
-            Title = item?.Text;
+            Title = item?.Name;
             Item = item;
         }
     }

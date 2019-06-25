@@ -35,6 +35,7 @@
     </ContentPage.ToolbarItems>
     <ScrollView>
         <StackLayout Spacing="20" Padding="15" x:Name="FirstStackLayout">
+            <Label Text="{Binding CategoryName}" FontSize="Medium"/>
         </StackLayout>
     </ScrollView>
 </ContentPage>

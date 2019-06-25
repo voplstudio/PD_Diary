@@ -20,7 +20,7 @@ namespace PD_Diary.Views
 		public DayPage ()
 		{
 			InitializeComponent ();
-            DailyRecord dailyRecord = new MockDataStore().GetDailyRecord(DateTime.Now);
+            DailyRecord dailyRecord = DailyRecord.GetDailyRecord(DateTime.Now);
             ApplyDailyRecord(dailyRecord);
         }
         public void ApplyDailyRecord(DailyRecord dailyRecord)
@@ -40,7 +40,7 @@ namespace PD_Diary.Views
                 MealGrid.Children.Add(new Label() { Text = meal.Id.ToString() }, 0, rowIdx++);
                 foreach (Consumption consumption in meal.Consumptions)
                 {
-                    MealGrid.Children.Add(new Label() { Text = "    " + new MockDataStore().GetItemAsync(consumption.Id).Result.Text}, 0, rowIdx);
+                    MealGrid.Children.Add(new Label() { Text = "    " + App.Database.GetItemAsync(consumption.Id).Result.Name }, 0, rowIdx);
                     MealGrid.Children.Add(new Label() { Text = consumption.Weight.ToString(), HorizontalTextAlignment = TextAlignment.End }, 1, rowIdx);
                     MealGrid.Children.Add(new Label() { Text = "g" }, 2, rowIdx++);
                 }
@@ -54,7 +54,7 @@ namespace PD_Diary.Views
             {
                 foreach (Consumption consumption in meal.Consumptions)
                 {
-                    Nutrient nutrient = new MockDataStore().GetItem(consumption.Id);
+                    Nutrient nutrient = App.Database.GetItem(consumption.Id);
                     foreach (Component component in nutrient.Components)
                     {
                         double addition = component.Per100gramm * consumption.Weight / 100.0;

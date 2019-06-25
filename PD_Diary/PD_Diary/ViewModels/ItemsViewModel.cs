@@ -13,34 +13,39 @@ namespace PD_Diary.ViewModels
 {
     public class ItemsViewModel : BaseViewModel
     {
-        public ObservableCollection<Nutrient> Items { get; set; }
+        public ObservableCollection<Tuple<int,string>> Items { get; set; }
         public Command LoadItemsCommand { get; set; }
 
         public ItemsViewModel()
         {
             Title = "Browse";
-            Items = new ObservableCollection<Nutrient>();
+            Items = new ObservableCollection<Tuple<int, string>>();
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
 
             MessagingCenter.Subscribe<ItemDetailPage, Nutrient>(this, "AddNutrientOnList", (obj, item) =>
            {
-               var newItem = item as Nutrient;
+               var newItem = new Tuple<int, string>(item.Id, item.Name);
                Items.Add(newItem);
                 //await DataStore.AddItemAsync(newItem);
             });
             MessagingCenter.Subscribe<ItemDetailPage, Nutrient>(this, "RemoveNutrient", (obj, item) =>
            {
-               var foundItem = Items.FirstOrDefault(x => x.Id == item.Id);
+               var foundItem = Items.FirstOrDefault(x => x.Item1 == item.Id);
                if (foundItem != null)
                    Items.Remove(foundItem); 
                //await DataStore.DeleteItemAsync(newItem);
            });
             MessagingCenter.Subscribe<ItemDetailPage, Nutrient>(this, "UpdateNutrient", (obj, item) =>
             {
-                var foundItem = Items.FirstOrDefault(x => x.Id == item.Id);
+                var foundItem = Items.FirstOrDefault(x => x.Item1 == item.Id);
+                var newItem = new Tuple<int, string>(item.Id, item.Name);
                 if (foundItem != null)
+                {
+                    Items.Insert(Items.IndexOf(foundItem), newItem);
                     Items.Remove(foundItem);
-                Items.Add(item);
+                }
+                else
+                    Items.Add(newItem);
                 //await DataStore.UpdateItemAsync(newItem);
             });
 

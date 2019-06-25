@@ -10,6 +10,7 @@ namespace PD_Diary.Views
     public partial class ItemsPage : ContentPage
     {
         ItemsViewModel viewModel;
+        private int CategoryId;
 
         public ItemsPage()
         {
@@ -18,28 +19,45 @@ namespace PD_Diary.Views
             BindingContext = viewModel = new ItemsViewModel();
         }
 
+        public ItemsPage(int id)
+        {
+            InitializeComponent();
+
+            BindingContext = viewModel = new ItemsViewModel();
+            CategoryId = id;
+        }
+
         async void OnItemSelected(object sender, SelectedItemChangedEventArgs args)
         {
-            if (!(args.SelectedItem is Nutrient item))
-            {
-                return;
-            }
+            Nutrient item;
+                if (args.SelectedItem is Tuple<int, string> tuple)
+                    item = Nutrient.Get(tuple.Item1);
+                else
+                    return;
 
             await Navigation.PushModalAsync(new NavigationPage(new ItemDetailPage(item)));
 
             // Manually deselect item.
-            ItemsListView.SelectedItem = null;
+            //ItemsListView.SelectedItem = null;
         }
 
         async void AddItem_Clicked(object sender, EventArgs e)
         {
 
-            await Navigation.PushModalAsync(new NavigationPage(new ItemDetailPage(null) { ReadOnly = false }));
+            await Navigation.PushModalAsync(new NavigationPage(new ItemDetailPage() { ReadOnly = false }));
             //await Navigation.PushModalAsync(new NavigationPage(new NewItemPage()));
         }
 
+
+        public string CategoryName => "XX";
         protected override void OnAppearing()
         {
+            if( CategoryId == 0)
+            NutrientList.ItemsSource = App.Database.GetItems<Nutrient>();
+            else
+            {
+                NutrientList.ItemsSource = App.Database.GetNutrientsByCategory(CategoryId);
+            }
             base.OnAppearing();
 
             if (viewModel.Items.Count == 0)

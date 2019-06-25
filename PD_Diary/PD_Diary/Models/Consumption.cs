@@ -2,10 +2,10 @@
 {
     public class Consumption
     {
-        public string Id;
+        public int Id;
         public double Weight;
 
-        public Consumption(string id, double weight)
+        public Consumption(int id, double weight)
         {
             Id = id;
             Weight = weight;

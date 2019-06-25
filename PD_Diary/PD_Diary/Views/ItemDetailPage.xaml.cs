@@ -7,6 +7,8 @@ using PD_Diary.Models;
 using PD_Diary.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SQLite;
+using PD_Diary.Services;
 
 namespace PD_Diary.Views
 {
@@ -55,50 +57,63 @@ namespace PD_Diary.Views
             foreach (View v in grid.Children) if ((col == Grid.GetColumn(v)) && (row == Grid.GetRow(v))) return v;
             return null;
         }
+
+        public string CategoryName => GetCategoryName();
+
+        private string GetCategoryName()
+        {
+            if (_nutrient != null)
+            {
+                string databasePath = DependencyService.Get<ISQLite>().GetDatabasePath(App.DATABASE_NAME);
+                SQLiteConnection database = new SQLiteConnection(databasePath);
+                try
+                {
+                    database.CreateTable<Nutrient>();
+                    CategoryData categoryData = database.Get<CategoryData>(Convert.ToInt32(_nutrient.CategoryID));
+                    if (categoryData != null) return categoryData.Name;
+                }
+                catch(Exception){/* do nothing to return default*/}
+                finally
+                {
+                    database.Close();
+                }
+            }
+            return "без категории";
+        }
+
+        public ItemDetailPage(int id)
+        {
+            InitializeComponent();
+            InitPage(Nutrient.Get(id));
+        }
+
         public ItemDetailPage(Nutrient nutrient)
         {
-            InitializeComponent();                      
+            InitializeComponent();
+            InitPage(nutrient);
+        }
 
+        private void InitPage(Nutrient nutrient)
+        {
             if (nutrient == null)
             {
-                _nutrient = NewNutrient();
+                _nutrient = Nutrient.GetNew();
             }
             else _nutrient = nutrient.Clone();
 
             AddComponentsAsGrid();
-            MessagingCenter.Subscribe<ItemDetailPage, Nutrient>(this, "AddNutrient", async (obj, item) =>
-            {
-            });
             MessagingCenter.Subscribe<ItemDetailPage, Nutrient>(this, "RemoveNutrient", async (obj, item) =>
             {
-                await new Services.MockDataStore().DeleteItemAsync(_nutrient.Id);
+                await App.Database.DeleteItemAsync(_nutrient.Id);
             });
-        }
-
-        private static Nutrient NewNutrient()
-        {
-            return new Nutrient()
-            {
-                Id = "",
-                Components = new List<Component> {
-                        new Component{Id = ComponentType.Protein, Per100gramm = 0},
-                        new Component{Id = ComponentType.Fat, Per100gramm = 0},
-                        new Component{Id = ComponentType.Carbohydrate, Per100gramm = 0},
-                        new Component{Id = ComponentType.Sodium, Per100gramm = 0},
-                        new Component{Id = ComponentType.Potassium, Per100gramm = 0},
-                        new Component{Id = ComponentType.Phosphates, Per100gramm = 0},
-                        new Component{Id = ComponentType.Calories, Per100gramm = 0}
-                    }
-            };
+            BindingContext = this;
         }
 
         public ItemDetailPage()
         {
             InitializeComponent();
 
-            _nutrient = new Services.MockDataStore().GetItemAsync("FBFBC500-209F-4A8B-88CF-A6EB8DF01192").Result;
-
-            AddComponentsAsGrid();
+            InitPage(null);
         }
 
         private void AddComponents(Nutrient item)
@@ -115,7 +130,7 @@ namespace PD_Diary.Views
                 });
             }
         }
-
+        //public string Title { get; set; } = "test title";
         private void AddComponentsAsGrid()
         {
             if (_nutrient == null || _nutrient.Components == null || _nutrient.Components.Count == 0)
@@ -124,7 +139,7 @@ namespace PD_Diary.Views
                 return;
             }
             FirstStackLayout.Children.Add(new Label { Text = "Название продукта" });
-            FirstStackLayout.Children.Add(titleEditor = new Editor { Text = _nutrient.Text, IsEnabled = !_readOnly });
+            FirstStackLayout.Children.Add(titleEditor = new Editor { Text = _nutrient.Name, IsEnabled = !_readOnly });
             grid = new Grid();
 
             for (int i = 0; i < _nutrient.Components.Count; i++)
@@ -153,17 +168,21 @@ namespace PD_Diary.Views
             for (int i = 0; i < _nutrient.Components.Count; i++)
             {
                 Editor editor = (Editor)grid.Children[i * 3 + 1];
-                double result = 0;
-                if (Double.TryParse(editor.Text, out result)) _nutrient.Components[i].Per100gramm = result;
+                if (double.TryParse(editor.Text, out double result)) _nutrient.Components[i].Per100gramm = result;
             }
             if (titleEditor != null)
-                _nutrient.Text = titleEditor.Text;
+                _nutrient.Name = titleEditor.Text;
 
-            await new Services.MockDataStore().AddItemAsync(_nutrient);
-
-            if (string.IsNullOrEmpty(_nutrient.Id))
+            if (_nutrient.Id == 0)
+            {
+                await App.Database.AddItemAsync(_nutrient);
                 MessagingCenter.Send(this, "AddNutrientOnList", _nutrient);
-            else MessagingCenter.Send(this, "UpdateNutrient", _nutrient);
+            }
+            else
+            {
+                await App.Database.UpdateItemAsync(_nutrient);
+                MessagingCenter.Send(this, "UpdateNutrient", _nutrient);
+            }
             MessagingCenter.Send(this, "AddNutrient", _nutrient);
             await Navigation.PopModalAsync();
         }

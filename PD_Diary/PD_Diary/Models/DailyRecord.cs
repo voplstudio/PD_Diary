@@ -18,9 +18,20 @@ namespace PD_Diary.Models
                 { MealType.Supper, new Meal() { Id = MealType.Supper } }
             };
         } 
-        public void AddConsumption(MealType mealType, string id, double weight)
+        public void AddConsumption(MealType mealType, int id, double weight)
         {
             Meals[mealType].Consumptions.Add(new Consumption(id, weight));
+        }
+
+        public static DailyRecord GetDailyRecord(DateTime date)
+        {
+            // TODO: Get data from DB
+
+            DailyRecord dailyRecord = new DailyRecord { Date = date };
+            dailyRecord.AddConsumption(MealType.Breakfast, 100, 200);
+            dailyRecord.AddConsumption(MealType.Lunch, 200, 100);
+            dailyRecord.AddConsumption(MealType.Lunch, 300, 300);
+            return dailyRecord;
         }
     }
 

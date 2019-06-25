@@ -9,9 +9,11 @@ namespace PD_Diary.Models
 
         internal Component Clone()
         {
-            var newItem = new Component();
-            newItem.Id = Id;
-            newItem.Per100gramm = Per100gramm;
+            var newItem = new Component
+            {
+                Id = Id,
+                Per100gramm = Per100gramm
+            };
             return newItem;
         }
     }
